@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
 import pro.sky.telegrambot.entity.NotificationTask;
 import pro.sky.telegrambot.service.NotificationTaskService;
 
@@ -23,16 +23,12 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-import static java.time.LocalDateTime.parse;
-
 @Component
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{2})\\s+([А-я\\d\\s.,!?:]+)");
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
-
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     private final TelegramBot telegramBot;
     private final NotificationTaskService notificationTaskService;
@@ -76,7 +72,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                                     sendMessage(chatId, "Задача успешно запланирована");
                                 }
                             } else {
-                                sendMessage(chatId, "Некорректный формат сообщения");
+                                sendMessage(chatId, "Некорректный формат сообщения ");
                             }
                         }
                     });
