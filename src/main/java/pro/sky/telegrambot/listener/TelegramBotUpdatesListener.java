@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-
 import pro.sky.telegrambot.entity.NotificationTask;
 import pro.sky.telegrambot.service.NotificationTaskService;
 
@@ -38,24 +37,22 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         this.notificationTaskService = notificationTaskService;
     }
 
-    @PostConstruct
+   @PostConstruct
     public void init() {
-        telegramBot.setUpdatesListener(this);
+       telegramBot.setUpdatesListener(this);
     }
-
     @Override
     public int process(List<Update> updates) {
         try {
-            updates.stream()
-                    .filter(update -> update.message() !=null)
+            updates.stream().filter(update -> update.message() != null)
                     .forEach(update -> {
-                        logger.info("Processing update: {}", update);
+                        logger.info("Handles update: {}", update);
                         Message message = update.message();
                         Long chatId = message.chat().id();
                         String text = message.text();
 
                         if ("/start".equals(text)) {
-                            sendMessage(chatId, "Привет. Введи запланированную задачу в формате: 01.01.2023 10:00 Сделать задачу");
+                            sendMessage(chatId, "Приветствую. Введите  задачу в формате: 01.01.2023 00:00 Ваша задача");
                         } else if (text != null) {
                             Matcher matcher = pattern.matcher(text);
                             if (matcher.find()) {
@@ -93,7 +90,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         SendMessage sendMessage = new SendMessage(chatId, message);
         SendResponse sendResponse = telegramBot.execute(sendMessage);
         if (!sendResponse.isOk()) {
-            logger.error("Error", sendResponse.description());
+            logger.error("Error during sending message: {}", sendResponse.description());
         }
     }
 
