@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.entity.NotificationTask;
 import pro.sky.telegrambot.service.NotificationTaskService;
 
@@ -23,16 +22,12 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-import static java.time.LocalDateTime.parse;
-
 @Component
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{2})\\s+([А-я\\d\\s.,!?:]+)");
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
-
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     private final TelegramBot telegramBot;
     private final NotificationTaskService notificationTaskService;
@@ -42,24 +37,22 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         this.notificationTaskService = notificationTaskService;
     }
 
-    @PostConstruct
+   @PostConstruct
     public void init() {
-        telegramBot.setUpdatesListener(this);
+       telegramBot.setUpdatesListener(this);
     }
-
     @Override
     public int process(List<Update> updates) {
         try {
-            updates.stream()
-                    .filter(update -> update.message() !=null)
+            updates.stream().filter(update -> update.message() != null)
                     .forEach(update -> {
-                        logger.info("Processing update: {}", update);
+                        logger.info("Handles update: {}", update);
                         Message message = update.message();
                         Long chatId = message.chat().id();
                         String text = message.text();
 
                         if ("/start".equals(text)) {
-                            sendMessage(chatId, "Привет. Введи запланированную задачу в формате: 01.01.2023 10:00 Сделать задачу");
+                            sendMessage(chatId, "Приветствую. Введите  задачу в формате: 01.01.2023 00:00 Ваша задача");
                         } else if (text != null) {
                             Matcher matcher = pattern.matcher(text);
                             if (matcher.find()) {
@@ -76,7 +69,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                                     sendMessage(chatId, "Задача успешно запланирована");
                                 }
                             } else {
-                                sendMessage(chatId, "Некорректный формат сообщения");
+                                sendMessage(chatId, "Некорректный формат сообщения ");
                             }
                         }
                     });
@@ -97,7 +90,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         SendMessage sendMessage = new SendMessage(chatId, message);
         SendResponse sendResponse = telegramBot.execute(sendMessage);
         if (!sendResponse.isOk()) {
-            logger.error("Error", sendResponse.description());
+            logger.error("Error during sending message: {}", sendResponse.description());
         }
     }
 

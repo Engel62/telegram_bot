@@ -22,8 +22,9 @@ public class NotificationTaskTimer {
 
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
     public void task() {
-        notificationTaskRepository.findAllByNotificationDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)).forEach(notificationTask -> {telegramBot.execute(
-                new SendMessage(notificationTask.getChatId(),"Напоминание: " +notificationTask.getMessage()));
+        notificationTaskRepository.findAllByNotificationDateTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+        ).forEach(notificationTask -> {
+            telegramBot.execute(new SendMessage(notificationTask.getChatId(),"Напоминание: " +notificationTask.getMessage()));
                 notificationTaskRepository.delete(notificationTask);
         });
     }
